@@ -1,0 +1,431 @@
+/* Custom AG Grid theme that matches the app design system */
+
+.ag-theme-helix {
+  /* Base colors from CSS variables */
+  --ag-background-color: hsl(var(--background));
+  --ag-foreground-color: hsl(var(--foreground));
+  --ag-border-color: hsl(var(--border));
+  --ag-secondary-foreground-color: hsl(var(--muted-foreground));
+
+  /* Header styling */
+  --ag-header-background-color: hsl(var(--muted) / 0.8);
+  --ag-header-foreground-color: hsl(var(--foreground));
+  --ag-header-border-color: hsl(var(--border));
+  --ag-header-height: 44px;
+
+  /* Cell styling */
+  --ag-cell-horizontal-padding: 12px;
+  --ag-cell-vertical-padding: 8px;
+  --ag-row-height: 40px;
+
+  /* Selection and hover */
+  --ag-row-hover-color: hsl(var(--muted) / 0.5);
+  --ag-selected-row-background-color: hsl(var(--muted) / 0.7);
+
+  /* Borders and separators */
+  --ag-row-border-color: hsl(var(--border));
+  --ag-cell-horizontal-border: none;
+
+  /* Typography */
+  --ag-font-family: inherit;
+  --ag-font-size: 14px;
+  --ag-header-font-size: 14px;
+  --ag-header-font-weight: 500;
+
+  /* Interactive elements */
+  --ag-input-border-color: hsl(var(--border));
+  --ag-input-border-color-invalid: hsl(var(--destructive));
+  --ag-checkbox-background-color: hsl(var(--background));
+  --ag-checkbox-border-color: hsl(var(--border));
+  --ag-checkbox-checked-color: hsl(var(--primary));
+
+  /* Scrollbars */
+  --ag-scrollbar-track-color: hsl(var(--muted));
+  --ag-scrollbar-thumb-color: hsl(var(--muted-foreground) / 0.3);
+  --ag-scrollbar-thumb-hover-color: hsl(var(--muted-foreground) / 0.5);
+
+  /* Borders and radius */
+  --ag-borders: none;
+  --ag-borders-row: solid 1px;
+  --ag-borders-side-button: none;
+  --ag-borders-input: solid 1px;
+  --ag-border-radius: 6px;
+  --ag-wrapper-border-radius: 8px;
+}
+
+/* Header customization */
+.ag-theme-helix .ag-header {
+  border-bottom: 1px solid hsl(var(--border));
+  font-weight: 500;
+}
+
+.ag-theme-helix .ag-header-cell {
+  border-right: none;
+}
+
+.ag-theme-helix .ag-header-cell-label {
+  font-weight: 500;
+  color: hsl(var(--foreground));
+}
+
+/* Row styling */
+.ag-theme-helix .ag-row {
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.ag-theme-helix .ag-row:last-child {
+  border-bottom: none;
+}
+
+.ag-theme-helix .ag-row-even {
+  background-color: hsl(var(--background));
+}
+
+.ag-theme-helix .ag-row-odd {
+  background-color: hsl(var(--muted) / 0.5);
+}
+
+/* Cell styling */
+.ag-theme-helix .ag-cell {
+  border-right: none;
+  display: flex;
+  align-items: center;
+  color: hsl(var(--foreground));
+}
+
+.ag-theme-helix .ag-cell-focus {
+  border: 2px solid hsl(var(--ring));
+  outline: none;
+}
+
+/* Selection styling */
+.ag-theme-helix .ag-row-selected {
+  background-color: hsl(var(--muted) / 0.7) !important;
+}
+
+/* Pagination styling */
+.ag-theme-helix .ag-paging-panel {
+  border-top: 1px solid hsl(var(--border));
+  background-color: hsl(var(--muted) / 0.8);
+  color: hsl(var(--foreground));
+  padding: 8px 16px;
+  height: auto;
+  min-height: 44px;
+}
+
+.ag-theme-helix .ag-paging-button {
+  background-color: transparent;
+  border: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+  border-radius: 4px;
+  margin: 0 2px;
+  padding: 4px 8px;
+  height: 28px;
+  min-width: 28px;
+}
+
+.ag-theme-helix .ag-paging-button:hover {
+  background-color: hsl(var(--muted));
+}
+
+.ag-theme-helix .ag-paging-button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Pagination text and labels */
+.ag-theme-helix .ag-paging-row-summary-panel {
+  color: hsl(var(--foreground));
+}
+
+.ag-theme-helix .ag-paging-page-summary-panel {
+  color: hsl(var(--foreground));
+}
+
+/* Loading overlay */
+.ag-theme-helix .ag-overlay-loading-wrapper {
+  background-color: hsl(var(--background) / 0.8);
+  color: hsl(var(--foreground));
+}
+
+.ag-theme-helix .ag-overlay-loading-center {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* No rows overlay */
+.ag-theme-helix .ag-overlay-no-rows-wrapper {
+  background-color: hsl(var(--background) / 0.8);
+  color: hsl(var(--muted-foreground));
+}
+
+.ag-theme-helix .ag-overlay-no-rows-center {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Column menu and filter panels */
+.ag-theme-helix .ag-menu {
+  background-color: hsl(var(--popover));
+  border: 1px solid hsl(var(--border));
+  border-radius: 8px;
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -2px rgb(0 0 0 / 0.05);
+  min-width: 200px;
+}
+
+.ag-theme-helix .ag-menu-header {
+  background-color: hsl(var(--muted));
+  border-bottom: 1px solid hsl(var(--border));
+  color: hsl(var(--foreground));
+  font-weight: 500;
+  padding: 8px 12px;
+}
+
+.ag-theme-helix .ag-menu-option {
+  color: hsl(var(--popover-foreground));
+  padding: 8px 12px;
+  border-radius: 4px;
+  margin: 2px 4px;
+}
+
+.ag-theme-helix .ag-menu-option:hover {
+  background-color: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+.ag-theme-helix .ag-menu-option-active {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+/* Filter panels */
+.ag-theme-helix .ag-filter-toolpanel {
+  background-color: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.ag-theme-helix .ag-filter {
+  background-color: hsl(var(--card));
+  border: none;
+}
+
+.ag-theme-helix .ag-filter-header-text {
+  color: hsl(var(--foreground));
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.ag-theme-helix .ag-filter-condition {
+  margin-bottom: 8px;
+}
+
+.ag-theme-helix .ag-filter-apply-panel {
+  margin-top: 12px;
+  padding-top: 8px;
+  border-top: 1px solid hsl(var(--border));
+}
+
+.ag-theme-helix .ag-filter-apply-panel button {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  border: none;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  margin-right: 8px;
+  cursor: pointer;
+}
+
+.ag-theme-helix .ag-filter-apply-panel button:hover {
+  background-color: hsl(var(--primary) / 0.9);
+}
+
+/* Dropdown/Select controls */
+.ag-theme-helix .ag-select .ag-picker-field {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+  color: hsl(var(--foreground));
+}
+
+.ag-theme-helix .ag-select .ag-picker-field:focus {
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+}
+
+.ag-theme-helix .ag-picker-field-wrapper {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+}
+
+.ag-theme-helix .ag-picker-field-icon {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Select dropdown options */
+.ag-theme-helix .ag-list-item {
+  color: hsl(var(--foreground));
+}
+
+.ag-theme-helix .ag-list-item:hover {
+  background-color: hsl(var(--accent));
+}
+
+.ag-theme-helix .ag-select-list {
+  background-color: hsl(var(--popover));
+  border: 1px solid hsl(var(--border));
+  border-radius: 6px;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+}
+
+/* Input styling */
+.ag-theme-helix .ag-input-field-input {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 4px;
+  color: hsl(var(--foreground));
+  padding: 6px 8px;
+  font-size: 14px;
+}
+
+.ag-theme-helix .ag-input-field-input:focus {
+  outline: none;
+  border-color: hsl(var(--ring));
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.2);
+}
+
+/* Checkbox styling - inherit AG Grid's checkbox but customize colors */
+.ag-theme-helix .ag-checkbox-input-wrapper {
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 3px;
+}
+
+.ag-theme-helix .ag-checkbox-input-wrapper.ag-checked {
+  background-color: hsl(var(--primary));
+  border-color: hsl(var(--primary));
+}
+
+.ag-theme-helix
+  .ag-checkbox-input-wrapper.ag-checked
+  .ag-checkbox-checked-icon {
+  color: hsl(var(--primary-foreground));
+}
+
+/* Header controls - menu and sort buttons */
+.ag-theme-helix .ag-header-cell-menu-button,
+.ag-theme-helix .ag-header-cell-filter-button {
+  color: hsl(var(--muted-foreground));
+  opacity: 0.7;
+}
+
+.ag-theme-helix .ag-header-cell-menu-button:hover,
+.ag-theme-helix .ag-header-cell-filter-button:hover {
+  opacity: 1;
+  color: hsl(var(--foreground));
+}
+
+/* Active filter indicator */
+.ag-theme-helix .ag-header-cell-filtered .ag-header-cell-filter-button {
+  color: hsl(var(--primary));
+  opacity: 1;
+}
+
+.ag-theme-helix .ag-header-cell-filtered .ag-header-cell-filter-button::after {
+  content: "●";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  font-size: 8px;
+  color: hsl(var(--primary));
+}
+
+/* Sort indicators */
+.ag-theme-helix .ag-sort-ascending-icon,
+.ag-theme-helix .ag-sort-descending-icon,
+.ag-theme-helix .ag-sort-mixed-icon {
+  color: hsl(var(--primary));
+}
+
+/* Ensure AG Grid icons are visible */
+.ag-theme-helix .ag-icon {
+  color: inherit;
+}
+
+/* Column menu and filter icons */
+.ag-theme-helix .ag-icon-menu,
+.ag-theme-helix .ag-icon-filter,
+.ag-theme-helix .ag-icon-columns {
+  color: hsl(var(--muted-foreground));
+}
+
+/* Pagination controls */
+.ag-theme-helix .ag-icon-first,
+.ag-theme-helix .ag-icon-previous,
+.ag-theme-helix .ag-icon-next,
+.ag-theme-helix .ag-icon-last {
+  color: hsl(var(--foreground));
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ag-theme-helix {
+    --ag-cell-horizontal-padding: 8px;
+    --ag-font-size: 13px;
+    --ag-header-font-size: 13px;
+  }
+}
+
+/* Dark mode specific overrides */
+:root.dark .ag-theme-helix .ag-row-odd {
+  background-color: hsl(var(--muted) / 0.7);
+}
+
+:root.dark .ag-theme-helix .ag-header {
+  background-color: hsl(var(--muted));
+}
+
+:root.dark .ag-theme-helix .ag-paging-panel {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
+/* Custom scrollbar for better appearance */
+.ag-theme-helix .ag-body-horizontal-scroll,
+.ag-theme-helix .ag-body-vertical-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground) / 0.3) hsl(var(--muted));
+}
+
+.ag-theme-helix .ag-body-horizontal-scroll::-webkit-scrollbar,
+.ag-theme-helix .ag-body-vertical-scroll::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.ag-theme-helix .ag-body-horizontal-scroll::-webkit-scrollbar-track,
+.ag-theme-helix .ag-body-vertical-scroll::-webkit-scrollbar-track {
+  background: hsl(var(--muted));
+}
+
+.ag-theme-helix .ag-body-horizontal-scroll::-webkit-scrollbar-thumb,
+.ag-theme-helix .ag-body-vertical-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.3);
+  border-radius: 4px;
+}
+
+.ag-theme-helix .ag-body-horizontal-scroll::-webkit-scrollbar-thumb:hover,
+.ag-theme-helix .ag-body-vertical-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.5);
+}

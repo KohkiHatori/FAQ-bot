@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "susten-faq-bot"
+version = "0.1.0"
+description = "A FAQ bot system with RAG capabilities"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "fastapi==0.104.1",
+    "uvicorn[standard]==0.24.0",
+    "pydantic==2.5.0",
+    "google-generativeai==0.3.2",
+    "sentence-transformers>=3.0.0",
+    "huggingface-hub>=0.20.0,<1.0.0",
+    "faiss-cpu>=1.11.0",
+    "numpy>=1.26.0",
+    "python-multipart==0.0.6",
+    "requests==2.32.4",
+    "boto3==1.34.0",
+    "botocore==1.34.0",
+    "rich>=12.4.1,<13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.24.0,<0.27.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.910",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "pytest-asyncio>=0.21.0",
+    "httpx>=0.24.0,<0.27.0",
+    "black>=22.0.0",
+    "flake8>=4.0.0",
+    "mypy>=0.910",
+]
+
+[project.scripts]
+faq-bot = "backend.main:main"
+api-server = "backend.api_server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["backend"]
+
+[tool.black]
+line-length = 88
+target-version = ['py311']
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
