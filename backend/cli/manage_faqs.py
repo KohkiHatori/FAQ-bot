@@ -535,87 +535,14 @@ def show_help():
     console.print(Panel(help_text, title="🚀 Help", border_style="cyan"))
 
 
-def ensure_faq_table_exists(cursor):
-    """Ensure the FAQ table and related structures exist"""
-    try:
-        # Create FAQs table
-        cursor.execute(
-            """
-            CREATE TABLE IF NOT EXISTS faqs (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                question TEXT NOT NULL,
-                answer TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        """
-        )
-
-        # Create indexes for better search performance
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_question ON faqs(question)")
-        cursor.execute("CREATE INDEX IF NOT EXISTS idx_answer ON faqs(answer)")
-
-        # Create full-text search virtual table for better text search
-        cursor.execute(
-            """
-            CREATE VIRTUAL TABLE IF NOT EXISTS faqs_fts USING fts5(
-                question, answer, content='faqs', content_rowid='id'
-            )
-        """
-        )
-
-        # Create triggers to keep FTS table in sync
-        cursor.execute(
-            """
-            CREATE TRIGGER IF NOT EXISTS faqs_ai AFTER INSERT ON faqs BEGIN
-                INSERT INTO faqs_fts(rowid, question, answer) VALUES (new.id, new.question, new.answer);
-            END
-        """
-        )
-
-        cursor.execute(
-            """
-            CREATE TRIGGER IF NOT EXISTS faqs_ad AFTER DELETE ON faqs BEGIN
-                INSERT INTO faqs_fts(faqs_fts, rowid, question, answer) VALUES('delete', old.id, old.question, old.answer);
-            END
-        """
-        )
-
-        cursor.execute(
-            """
-            CREATE TRIGGER IF NOT EXISTS faqs_au AFTER UPDATE ON faqs BEGIN
-                INSERT INTO faqs_fts(faqs_fts, rowid, question, answer) VALUES('delete', old.id, old.question, old.answer);
-                INSERT INTO faqs_fts(rowid, question, answer) VALUES (new.id, new.question, new.answer);
-            END
-        """
-        )
-
-        return True
-    except Exception as e:
-        console.print(f"[red]❌ Failed to create table structure: {e}[/red]")
-        return False
-
-
 def sync_from_csv(csv_file_path):
-    """Sync FAQ data from CSV file to database"""
-    conn = connect_db()
-    if not conn:
+    """Sync FAQ data from CSV file to database using FAQManager"""
+    manager = get_faq_manager()
+    if not manager:
         return
-
-    cursor = conn.cursor()
-
-    # Ensure table structure exists
-    if not ensure_faq_table_exists(cursor):
-        conn.close()
-        return
-
-    # Commit the table creation
-    conn.commit()
 
     try:
         # Check if CSV file exists
-        import os
-
         if not os.path.exists(csv_file_path):
             console.print(f"[red]❌ CSV file not found: {csv_file_path}[/red]")
             return
@@ -641,7 +568,19 @@ def sync_from_csv(csv_file_path):
                     answer = row["answer"].strip()
 
                     if question and answer:  # Skip empty rows
-                        csv_data.append((question, answer))
+                        # Get optional columns with defaults
+                        status = row.get("status", "public").strip() or "public"
+                        category = row.get("category", "other").strip() or "other"
+                        tags_str = row.get("tags", "").strip()
+                        tags = [tag.strip() for tag in tags_str.split(",") if tag.strip()] if tags_str else []
+
+                        csv_data.append({
+                            "question": question,
+                            "answer": answer,
+                            "status": status,
+                            "category": category,
+                            "tags": tags
+                        })
 
         if not csv_data:
             console.print("[yellow]⚠️  No valid FAQ data found in CSV file[/yellow]")
@@ -651,38 +590,49 @@ def sync_from_csv(csv_file_path):
         console.print()
 
         # Process each FAQ entry
-        stats = {"updated": 0, "created": 0, "skipped": 0}
+        stats = {"updated": 0, "created": 0, "skipped": 0, "errors": 0}
 
-        with console.status("[bold green]Processing FAQ entries..."):
-            for question, answer in track(csv_data, description="Syncing FAQs"):
-                # Check if question already exists
-                cursor.execute(
-                    "SELECT id, answer FROM faqs WHERE question = ?", (question,)
-                )
-                existing = cursor.fetchone()
+        for entry in track(csv_data, description="Syncing FAQs"):
+            try:
+                question = entry["question"]
+                answer = entry["answer"]
+                status = entry["status"]
+                category = entry["category"]
+                tags = entry["tags"]
 
-                if existing:
-                    existing_id, existing_answer = existing
+                # Check if question already exists using search
+                existing_faqs = manager.search_faqs(question, limit=50)
+                existing_faq = None
 
+                # Look for exact question match
+                for faq in existing_faqs:
+                    if faq.question.strip().lower() == question.strip().lower():
+                        existing_faq = faq
+                        break
+
+                if existing_faq:
                     # Compare answers (normalize whitespace for comparison)
-                    if existing_answer.strip() != answer.strip():
+                    if (existing_faq.answer.strip() != answer.strip() or
+                        existing_faq.status != status or
+                        existing_faq.category != category or
+                        set(existing_faq.tags) != set(tags)):
+
                         # Update existing FAQ
-                        cursor.execute(
-                            """
-                            UPDATE faqs
-                            SET answer = ?, updated_at = CURRENT_TIMESTAMP
-                            WHERE id = ?
-                        """,
-                            (answer, existing_id),
+                        update_request = FAQUpdateRequest(
+                            question=question,
+                            answer=answer,
+                            status=status,
+                            category=category,
+                            tags=tags
                         )
+
+                        updated_faq, old_faq = manager.update_faq(existing_faq.id, update_request)
                         stats["updated"] += 1
 
                         # Show update info
-                        panel_content = (
-                            f"[yellow]🔄 Updated FAQ ID: {existing_id}[/yellow]\n\n"
-                        )
+                        panel_content = f"[yellow]🔄 Updated FAQ ID: {existing_faq.id}[/yellow]\n\n"
                         panel_content += f"[bold]Question:[/bold] {question[:100]}{'...' if len(question) > 100 else ''}\n\n"
-                        panel_content += f"[dim]Old Answer:[/dim] {existing_answer[:150]}{'...' if len(existing_answer) > 150 else ''}\n\n"
+                        panel_content += f"[dim]Old Answer:[/dim] {old_faq.answer[:150]}{'...' if len(old_faq.answer) > 150 else ''}\n\n"
                         panel_content += f"[bold green]New Answer:[/bold green] {answer[:150]}{'...' if len(answer) > 150 else ''}"
 
                         console.print(
@@ -693,49 +643,63 @@ def sync_from_csv(csv_file_path):
                         stats["skipped"] += 1
                 else:
                     # Create new FAQ
-                    cursor.execute(
-                        """
-                        INSERT INTO faqs (question, answer)
-                        VALUES (?, ?)
-                    """,
-                        (question, answer),
+                    create_request = FAQCreateRequest(
+                        question=question,
+                        answer=answer,
+                        status=status,
+                        category=category,
+                        tags=tags
                     )
-                    new_id = cursor.lastrowid
+
+                    new_faq = manager.create_faq(create_request)
                     stats["created"] += 1
 
                     # Show creation info
-                    panel_content = f"[green]✅ Created FAQ ID: {new_id}[/green]\n\n"
+                    panel_content = f"[green]✅ Created new FAQ ID: {new_faq.id}[/green]\n\n"
                     panel_content += f"[bold]Question:[/bold] {question[:100]}{'...' if len(question) > 100 else ''}\n\n"
                     panel_content += f"[bold]Answer:[/bold] {answer[:150]}{'...' if len(answer) > 150 else ''}"
+                    if status != "public":
+                        panel_content += f"\n[dim]Status:[/dim] {status}"
+                    if category != "other":
+                        panel_content += f"\n[dim]Category:[/dim] {category}"
+                    if tags:
+                        panel_content += f"\n[dim]Tags:[/dim] {', '.join(tags)}"
 
                     console.print(
                         Panel(panel_content, border_style="green", expand=False)
                     )
                     console.print()
 
-        # Commit all changes
-        conn.commit()
+            except Exception as e:
+                stats["errors"] += 1
+                console.print(f"[red]❌ Error processing FAQ: {e}[/red]")
+                continue
 
-        # Show summary statistics
-        summary_content = f"[bold blue]📊 Sync Summary:[/bold blue]\n\n"
-        summary_content += f"[green]✅ Created: {stats['created']} new FAQs[/green]\n"
-        summary_content += (
-            f"[yellow]🔄 Updated: {stats['updated']} existing FAQs[/yellow]\n"
-        )
-        summary_content += (
-            f"[dim]⏭️  Skipped: {stats['skipped']} unchanged FAQs[/dim]\n\n"
-        )
-        summary_content += f"[bold]Total processed: {len(csv_data)} entries[/bold]"
+        # Display final statistics
+        console.print()
+        stats_text = f"""[bold green]✅ CSV sync completed![/bold green]
 
-        console.print(
-            Panel(summary_content, title="🎯 CSV Sync Complete", border_style="blue")
-        )
+📊 [bold]Statistics:[/bold]
+• [green]Created:[/green] {stats['created']} new FAQs
+• [yellow]Updated:[/yellow] {stats['updated']} existing FAQs
+• [blue]Skipped:[/blue] {stats['skipped']} unchanged FAQs
+• [red]Errors:[/red] {stats['errors']} failed entries
+• [bold]Total processed:[/bold] {stats['created'] + stats['updated'] + stats['skipped']} entries
 
+💾 All changes have been saved to the database.
+🔄 Vector cache will need to be rebuilt for search functionality."""
+
+        console.print(Panel(stats_text, title="🎯 Sync Results", border_style="green"))
+
+        # Suggest cache rebuild if there were changes
+        if stats['created'] > 0 or stats['updated'] > 0:
+            console.print()
+            console.print("[yellow]💡 Tip: Run 'python cli/manage_cache.py build' to update the vector search cache[/yellow]")
+
+    except FileNotFoundError:
+        console.print(f"[red]❌ CSV file not found: {csv_file_path}[/red]")
     except Exception as e:
-        console.print(f"[red]❌ Failed to sync from CSV: {e}[/red]")
-        conn.rollback()
-
-    conn.close()
+        console.print(f"[red]❌ Failed to sync CSV data: {e}[/red]")
 
 
 def main():
