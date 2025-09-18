@@ -10,7 +10,7 @@ export default function Home() {
     {
       id: "1",
       content:
-        "こんにちは！私はSUSTEN AIアシスタントです。どのようなことでお手伝いできますか？",
+        "Hello! I am SUSTEN AI assistant. How can I help you?",
       sender: {
         id: "susten-ai",
         name: "SUSTEN AI",
@@ -227,13 +227,13 @@ export default function Home() {
             messages={messages}
             currentUserId="user"
             onSendMessage={handleSendMessage}
-            title="SUSTEN カスタマー・サポート・チャット"
+            title="SUSTEN FAQ Bot"
             subtitle={
               isLoading
                 ? streamingMessageId
-                  ? "回答中..."
-                  : "回答を考えています..."
-                : "待機中"
+                  ? "Answering..."
+                  : "Thinking..."
+                : "On standby..."
             }
             status={isLoading ? "typing" : "online"}
             className="min-h-0 flex-1"

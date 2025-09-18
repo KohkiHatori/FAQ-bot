@@ -16,8 +16,8 @@ class Settings(BaseModel):
     # AWS/Claude settings
     aws_access_key_id: Optional[str] = None
     aws_secret_access_key: Optional[str] = None
-    aws_region: str = "ap-northeast-1"
-    claude_model: str = "anthropic.claude-3-sonnet-20240229-v1:0"
+    aws_region: str = "us-east-1"
+    claude_model: str = "anthropic.claude-sonnet-4-20250514-v1:0"
 
     # RAG settings
     embedding_model: str = "intfloat/multilingual-e5-small"
@@ -43,9 +43,9 @@ class Settings(BaseModel):
             database_path=os.getenv("DATABASE_PATH", "faqs.db"),
             aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
-            aws_region=os.getenv("AWS_REGION", "ap-northeast-1"),
+            aws_region=os.getenv("AWS_REGION", "us-east-1"),
             claude_model=os.getenv(
-                "CLAUDE_MODEL", "apac.anthropic.claude-sonnet-4-20250514-v1:0"
+                "CLAUDE_MODEL", "us.anthropic.claude-sonnet-4-20250514-v1:0",
             ),
             embedding_model=os.getenv(
                 "EMBEDDING_MODEL", "intfloat/multilingual-e5-small"

@@ -572,15 +572,21 @@ def sync_from_csv(csv_file_path):
                         status = row.get("status", "public").strip() or "public"
                         category = row.get("category", "other").strip() or "other"
                         tags_str = row.get("tags", "").strip()
-                        tags = [tag.strip() for tag in tags_str.split(",") if tag.strip()] if tags_str else []
+                        tags = (
+                            [tag.strip() for tag in tags_str.split(",") if tag.strip()]
+                            if tags_str
+                            else []
+                        )
 
-                        csv_data.append({
-                            "question": question,
-                            "answer": answer,
-                            "status": status,
-                            "category": category,
-                            "tags": tags
-                        })
+                        csv_data.append(
+                            {
+                                "question": question,
+                                "answer": answer,
+                                "status": status,
+                                "category": category,
+                                "tags": tags,
+                            }
+                        )
 
         if not csv_data:
             console.print("[yellow]⚠️  No valid FAQ data found in CSV file[/yellow]")
@@ -612,10 +618,12 @@ def sync_from_csv(csv_file_path):
 
                 if existing_faq:
                     # Compare answers (normalize whitespace for comparison)
-                    if (existing_faq.answer.strip() != answer.strip() or
-                        existing_faq.status != status or
-                        existing_faq.category != category or
-                        set(existing_faq.tags) != set(tags)):
+                    if (
+                        existing_faq.answer.strip() != answer.strip()
+                        or existing_faq.status != status
+                        or existing_faq.category != category
+                        or set(existing_faq.tags) != set(tags)
+                    ):
 
                         # Update existing FAQ
                         update_request = FAQUpdateRequest(
@@ -623,14 +631,18 @@ def sync_from_csv(csv_file_path):
                             answer=answer,
                             status=status,
                             category=category,
-                            tags=tags
+                            tags=tags,
                         )
 
-                        updated_faq, old_faq = manager.update_faq(existing_faq.id, update_request)
+                        updated_faq, old_faq = manager.update_faq(
+                            existing_faq.id, update_request
+                        )
                         stats["updated"] += 1
 
                         # Show update info
-                        panel_content = f"[yellow]🔄 Updated FAQ ID: {existing_faq.id}[/yellow]\n\n"
+                        panel_content = (
+                            f"[yellow]🔄 Updated FAQ ID: {existing_faq.id}[/yellow]\n\n"
+                        )
                         panel_content += f"[bold]Question:[/bold] {question[:100]}{'...' if len(question) > 100 else ''}\n\n"
                         panel_content += f"[dim]Old Answer:[/dim] {old_faq.answer[:150]}{'...' if len(old_faq.answer) > 150 else ''}\n\n"
                         panel_content += f"[bold green]New Answer:[/bold green] {answer[:150]}{'...' if len(answer) > 150 else ''}"
@@ -648,14 +660,16 @@ def sync_from_csv(csv_file_path):
                         answer=answer,
                         status=status,
                         category=category,
-                        tags=tags
+                        tags=tags,
                     )
 
                     new_faq = manager.create_faq(create_request)
                     stats["created"] += 1
 
                     # Show creation info
-                    panel_content = f"[green]✅ Created new FAQ ID: {new_faq.id}[/green]\n\n"
+                    panel_content = (
+                        f"[green]✅ Created new FAQ ID: {new_faq.id}[/green]\n\n"
+                    )
                     panel_content += f"[bold]Question:[/bold] {question[:100]}{'...' if len(question) > 100 else ''}\n\n"
                     panel_content += f"[bold]Answer:[/bold] {answer[:150]}{'...' if len(answer) > 150 else ''}"
                     if status != "public":
@@ -692,9 +706,11 @@ def sync_from_csv(csv_file_path):
         console.print(Panel(stats_text, title="🎯 Sync Results", border_style="green"))
 
         # Suggest cache rebuild if there were changes
-        if stats['created'] > 0 or stats['updated'] > 0:
+        if stats["created"] > 0 or stats["updated"] > 0:
             console.print()
-            console.print("[yellow]💡 Tip: Run 'python cli/manage_cache.py build' to update the vector search cache[/yellow]")
+            console.print(
+                "[yellow]💡 Tip: Run 'python cli/manage_cache.py build' to update the vector search cache[/yellow]"
+            )
 
     except FileNotFoundError:
         console.print(f"[red]❌ CSV file not found: {csv_file_path}[/red]")

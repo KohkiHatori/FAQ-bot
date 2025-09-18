@@ -299,7 +299,7 @@ const ChatInput = React.forwardRef<HTMLDivElement, ChatInputProps>(
     return (
       <div ref={ref} className="flex w-full items-center space-x-2">
         <Input
-          placeholder={disabled ? "回答しています・・・" : "質問を入力して下さい。"}
+          placeholder={disabled ? "Generating・・・" : "Enter your question"}
           value={value}
           onChange={(e) => onChange(e.target.value)}
           onKeyPress={onKeyPress}

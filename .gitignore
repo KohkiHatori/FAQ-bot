@@ -37,4 +37,6 @@ Thumbs.db
 *.log
 
 # Project specific (root level)
-rag_cache/ 
+rag_cache/
+
+*.db
