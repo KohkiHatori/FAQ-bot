@@ -12,6 +12,11 @@
 
 **SUSTEN FAQ Bot** is a sophisticated, enterprise-grade customer support system built for financial services. It combines **Retrieval-Augmented Generation (RAG)** with **Claude AI** to deliver intelligent, context-aware responses in real-time. The system handles multilingual content (Japanese/English) and provides comprehensive FAQ management capabilities.
 
+
+https://github.com/user-attachments/assets/9a6ac67a-0f5a-4707-be84-2daa4fefa2d1
+
+
+
 ### **🏆 Key Achievements**
 - **Production-ready architecture** with 95%+ test coverage
 - **Real-time streaming responses** with sub-second query processing
