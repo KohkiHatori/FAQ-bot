@@ -45,7 +45,8 @@ class Settings(BaseModel):
             aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
             aws_region=os.getenv("AWS_REGION", "us-east-1"),
             claude_model=os.getenv(
-                "CLAUDE_MODEL", "us.anthropic.claude-sonnet-4-20250514-v1:0",
+                "CLAUDE_MODEL",
+                "us.anthropic.claude-sonnet-4-20250514-v1:0",
             ),
             embedding_model=os.getenv(
                 "EMBEDDING_MODEL", "intfloat/multilingual-e5-small"
